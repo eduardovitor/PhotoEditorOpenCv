@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:opencv/core/core.dart';
 import 'package:opencv/opencv.dart';
+import 'opencvfilters.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -16,6 +18,8 @@ class _HomeState extends State<Home> {
   final imgpicker = ImagePicker();
   late File? imgfile;
   late Image? image = null;
+  late Widget swapwidget = buildOptions();
+  int swap = 0;
   getImagefromGallery() async {
     var pickedFile = await imgpicker.pickImage(source: ImageSource.gallery);
     var tmpImgFile = File(pickedFile!.path);
@@ -48,22 +52,122 @@ class _HomeState extends State<Home> {
             child: Container(
               width: 100,
               height: 100,
-              color: Colors.black,
+              color: Colors.deepPurple,
               child: const Center(
                   child: Text('Blur', style: TextStyle(color: Colors.white))),
             ),
-            onTap: ApplyOpenCvBlur,
+            onTap: () async {
+              var img = await ApplyOpenCvBlur(image!, imgfile!);
+              setState(() {
+                image = img;
+              });
+            },
           ),
           const SizedBox(width: 15),
           GestureDetector(
               child: Container(
                   width: 100,
                   height: 100,
-                  color: Colors.black,
+                  color: Colors.deepPurple,
                   child: const Center(
                       child: Text('Filter 2D',
                           style: TextStyle(color: Colors.white)))),
-              onTap: ApplyOpenCv2DFilter)
+              onTap: () async {
+                var img = await ApplyOpenCv2DFilter(image!, imgfile!);
+                setState(() {
+                  image = img;
+                });
+              }),
+          const SizedBox(width: 15),
+          GestureDetector(
+              child: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.deepPurple,
+                  child: const Center(
+                      child: Text('Median blur',
+                          style: TextStyle(color: Colors.white)))),
+              onTap: () async {
+                var img = await ApplyMedianBlur(image!, imgfile!);
+                setState(() {
+                  image = img;
+                });
+              }),
+          const SizedBox(width: 15),
+          GestureDetector(
+              child: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.deepPurple,
+                  child: const Center(
+                      child: Text('Gaussian blur',
+                          style: TextStyle(color: Colors.white)))),
+              onTap: () async {
+                var img = await ApplyGaussianBlur(image!, imgfile!);
+                setState(() {
+                  image = img;
+                });
+              }),
+          const SizedBox(width: 15),
+          GestureDetector(
+              child: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.deepPurple,
+                  child: const Center(
+                      child: Text('Sobel',
+                          style: TextStyle(color: Colors.white)))),
+              onTap: () async {
+                var img = await ApplySobel(image!, imgfile!);
+                setState(() {
+                  image = img;
+                });
+              }),
+          const SizedBox(width: 15),
+          GestureDetector(
+              child: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.deepPurple,
+                  child: const Center(
+                      child: Text('Laplacian',
+                          style: TextStyle(color: Colors.white)))),
+              onTap: () async {
+                var img = await ApplyLaplacian(image!, imgfile!);
+                setState(() {
+                  image = img;
+                });
+              }),
+          const SizedBox(width: 15),
+          GestureDetector(
+              child: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.deepPurple,
+                  child: const Center(
+                      child: Text('Dilate',
+                          style: TextStyle(color: Colors.white)))),
+              onTap: () async {
+                var img = await ApplyDilate(image!, imgfile!);
+                setState(() {
+                  image = img;
+                });
+              }),
+          const SizedBox(width: 15),
+          GestureDetector(
+              child: Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.deepPurple,
+                  child: const Center(
+                      child: Text('Erode',
+                          style: TextStyle(color: Colors.white)))),
+              onTap: () async {
+                var img = await ApplyErode(image!, imgfile!);
+                setState(() {
+                  image = img;
+                });
+              }),
         ]);
   }
 
@@ -73,7 +177,11 @@ class _HomeState extends State<Home> {
       scrollDirection: Axis.horizontal,
       children: [
         ElevatedButton.icon(
-          onPressed: buildOpenCvOptions,
+          onPressed: () {
+            setState(() {
+              swapwidget = buildOpenCvOptions();
+            });
+          },
           icon: const Icon(Icons.portrait),
           label: const Text('Filters'),
           style: ElevatedButton.styleFrom(primary: Colors.deepPurple),
@@ -94,23 +202,6 @@ class _HomeState extends State<Home> {
         ),
       ],
     );
-  }
-
-  ApplyOpenCvBlur() async {
-    var img_bytes = await imgfile!.readAsBytes();
-    var edited_img =
-        await ImgProc.blur(img_bytes, [45, 45], [20, 30], Core.borderReflect);
-    setState(() {
-      image = Image.memory(edited_img);
-    });
-  }
-
-  ApplyOpenCv2DFilter() async {
-    var img_bytes = await imgfile!.readAsBytes();
-    var edited_img = await ImgProc.filter2D(img_bytes, -1, [2, 2]);
-    setState(() {
-      image = Image.memory(edited_img);
-    });
   }
 
   @override
@@ -137,7 +228,7 @@ class _HomeState extends State<Home> {
             Expanded(
                 child: Container(
                     child: checkImgNull(), alignment: Alignment.center)),
-            Expanded(child: buildOptions())
+            Expanded(child: swapwidget)
           ],
         ));
   }
