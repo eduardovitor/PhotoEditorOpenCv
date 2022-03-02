@@ -22,55 +22,48 @@ ApplyOpenCvBlur(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img =
       await ImgProc.blur(img_bytes, [45, 45], [20, 30], Core.borderReflect);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  return edited_img;
 }
 
 ApplyOpenCv2DFilter(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img = await ImgProc.filter2D(img_bytes, -1, [2, 2]);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  return edited_img;
 }
 
 ApplyMedianBlur(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img = await ImgProc.medianBlur(img_bytes, 45);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  return edited_img;
 }
 
 ApplyGaussianBlur(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img = await ImgProc.gaussianBlur(img_bytes, [45, 45], 0);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  return edited_img;
 }
 
 ApplySobel(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img = await ImgProc.sobel(img_bytes, -1, 1, 1);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  return edited_img;
 }
 
 ApplyLaplacian(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img = await ImgProc.laplacian(img_bytes, 10);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  ;
+  return edited_img;
 }
 
 ApplyDilate(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img = await ImgProc.dilate(img_bytes, [2, 2]);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  return edited_img;
 }
 
 ApplyErode(File imgfile) async {
   var img_bytes = await imgfile.readAsBytes();
   var edited_img = await ImgProc.erode(img_bytes, [2, 2]);
-  var img_memory = Image.memory(edited_img);
-  return img_memory;
+  return edited_img;
 }

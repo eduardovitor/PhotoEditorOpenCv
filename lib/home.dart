@@ -1,11 +1,13 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:opencv/core/core.dart';
 import 'package:opencv/opencv.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'opencvfilters.dart';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -60,10 +62,12 @@ class _HomeState extends State<Home> {
                   child: Text('Blur', style: TextStyle(color: Colors.white))),
             ),
             onTap: () async {
-              var img = await ApplyOpenCvBlur(imgfile!);
+              var imgbytesret = await ApplyOpenCvBlur(imgfile!);
               setState(() {
-                image = img;
+                image = Image.memory(imgbytesret);
               });
+              imgfile = await imgfile!
+                  .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
             },
           ),
           const SizedBox(width: 15),
@@ -76,10 +80,12 @@ class _HomeState extends State<Home> {
                       child: Text('Filter 2D',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyOpenCv2DFilter(imgfile!);
+                var imgbytesret = await ApplyOpenCv2DFilter(imgfile!);
                 setState(() {
-                  image = img;
+                  image = Image.memory(imgbytesret);
                 });
+                imgfile = await imgfile!
+                    .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
               }),
           const SizedBox(width: 15),
           GestureDetector(
@@ -91,10 +97,12 @@ class _HomeState extends State<Home> {
                       child: Text('Median blur',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyMedianBlur(imgfile!);
+                var imgbytesret = await ApplyMedianBlur(imgfile!);
                 setState(() {
-                  image = img;
+                  image = Image.memory(imgbytesret);
                 });
+                imgfile = await imgfile!
+                    .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
               }),
           const SizedBox(width: 15),
           GestureDetector(
@@ -106,10 +114,12 @@ class _HomeState extends State<Home> {
                       child: Text('Gaussian blur',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyGaussianBlur(imgfile!);
+                var imgbytesret = await ApplyGaussianBlur(imgfile!);
                 setState(() {
-                  image = img;
+                  image = Image.memory(imgbytesret);
                 });
+                imgfile = await imgfile!
+                    .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
               }),
           const SizedBox(width: 15),
           GestureDetector(
@@ -121,10 +131,12 @@ class _HomeState extends State<Home> {
                       child: Text('Sobel',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplySobel(imgfile!);
+                var imgbytesret = await ApplySobel(imgfile!);
                 setState(() {
-                  image = img;
+                  image = Image.memory(imgbytesret);
                 });
+                imgfile = await imgfile!
+                    .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
               }),
           const SizedBox(width: 15),
           GestureDetector(
@@ -136,10 +148,12 @@ class _HomeState extends State<Home> {
                       child: Text('Laplacian',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyLaplacian(imgfile!);
+                var imgbytesret = await ApplyLaplacian(imgfile!);
                 setState(() {
-                  image = img;
+                  image = Image.memory(imgbytesret);
                 });
+                imgfile = await imgfile!
+                    .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
               }),
           const SizedBox(width: 15),
           GestureDetector(
@@ -151,10 +165,12 @@ class _HomeState extends State<Home> {
                       child: Text('Dilate',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyDilate(imgfile!);
+                var imgbytesret = await ApplyDilate(imgfile!);
                 setState(() {
-                  image = img;
+                  image = Image.memory(imgbytesret);
                 });
+                imgfile = await imgfile!
+                    .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
               }),
           const SizedBox(width: 15),
           GestureDetector(
@@ -166,17 +182,19 @@ class _HomeState extends State<Home> {
                       child: Text('Erode',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyErode(imgfile!);
+                var imgbytesret = await ApplyErode(imgfile!);
                 setState(() {
-                  image = img;
+                  image = Image.memory(imgbytesret);
                 });
+                imgfile = await imgfile!
+                    .writeAsBytes(imgbytesret, mode: FileMode.writeOnly);
               }),
         ]);
   }
 
   buildOptions() {
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 50),
       scrollDirection: Axis.horizontal,
       children: [
         ElevatedButton.icon(
@@ -189,14 +207,7 @@ class _HomeState extends State<Home> {
           label: const Text('Filters'),
           style: ElevatedButton.styleFrom(primary: Colors.deepPurple),
         ),
-        const SizedBox(width: 5),
-        ElevatedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.circle),
-          label: const Text('Shapes'),
-          style: ElevatedButton.styleFrom(primary: Colors.deepPurple),
-        ),
-        const SizedBox(width: 5),
+        const SizedBox(width: 25),
         ElevatedButton.icon(
           onPressed: () {
             cropSquareImage(imgfile!);
@@ -222,8 +233,52 @@ class _HomeState extends State<Home> {
     }
   }
 
+  saveImage(String filename) async {
+    if (await _requestPermission(Permission.storage)) {
+      Directory? directory = await getExternalStorageDirectory();
+      String newPath = "";
+      print(directory);
+      List<String> paths = directory!.path.split("/");
+      for (int x = 1; x < paths.length; x++) {
+        String folder = paths[x];
+        if (folder != "Android") {
+          newPath += "/" + folder;
+        } else {
+          break;
+        }
+      }
+      newPath = newPath + "/PhotoEditor";
+      directory = Directory(newPath);
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      if (await directory.exists()) {
+        var fullname = directory.path + filename;
+        File newfile = File(fullname);
+        var bytes = await imgfile!.readAsBytes();
+        newfile = await newfile.writeAsBytes(bytes, mode: FileMode.append);
+        print(fullname);
+        print(newfile.path);
+        print("Saved copy of image");
+      }
+    }
+  }
+
+  Future<bool> _requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final GlobalKey _globalKey = GlobalKey();
     return Scaffold(
         appBar: AppBar(
             title: const Text('Photo editor', style: TextStyle(fontSize: 14)),
@@ -235,7 +290,13 @@ class _HomeState extends State<Home> {
               ),
               IconButton(
                 icon: const Icon(Icons.save),
-                onPressed: () {},
+                onPressed: () {
+                  DateTime now = DateTime.now();
+                  String formattedDate =
+                      DateFormat('yyyy-MM-dd – kk:mm').format(now);
+                  var filename = '/Copy' + formattedDate + '.jpg';
+                  saveImage(filename);
+                },
               ),
               IconButton(
                   icon: const Icon(Icons.restore),
