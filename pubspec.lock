@@ -43,13 +43,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
-  cropperx:
-    dependency: "direct main"
-    description:
-      name: cropperx
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   cross_file:
     dependency: transitive
     description:
@@ -83,6 +76,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.4"
+  flutter_painter:
+    dependency: "direct main"
+    description:
+      name: flutter_painter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -90,13 +90,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
-  flutter_shapes:
-    dependency: "direct main"
-    description:
-      name: flutter_shapes
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -121,6 +114,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.0"
+  image_cropper:
+    dependency: "direct main"
+    description:
+      name: image_cropper
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.5.0"
   image_picker:
     dependency: "direct main"
     description:

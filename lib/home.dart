@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:opencv/core/core.dart';
 import 'package:opencv/opencv.dart';
@@ -16,15 +16,18 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final imgpicker = ImagePicker();
+  late File? imgfile_original;
   late File? imgfile;
   late Image? image = null;
   late Widget swapwidget = buildOptions();
   int swap = 0;
+  var cropper = ImageCropper();
   getImagefromGallery() async {
     var pickedFile = await imgpicker.pickImage(source: ImageSource.gallery);
     var tmpImgFile = File(pickedFile!.path);
     setState(() {
       imgfile = tmpImgFile;
+      imgfile_original = tmpImgFile;
       image = Image.file(imgfile!);
     });
   }
@@ -39,7 +42,7 @@ class _HomeState extends State<Home> {
 
   restoreOriginalImage() {
     setState(() {
-      image = Image.file(imgfile!);
+      image = Image.file(imgfile_original!);
     });
   }
 
@@ -57,7 +60,7 @@ class _HomeState extends State<Home> {
                   child: Text('Blur', style: TextStyle(color: Colors.white))),
             ),
             onTap: () async {
-              var img = await ApplyOpenCvBlur(image!, imgfile!);
+              var img = await ApplyOpenCvBlur(imgfile!);
               setState(() {
                 image = img;
               });
@@ -73,7 +76,7 @@ class _HomeState extends State<Home> {
                       child: Text('Filter 2D',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyOpenCv2DFilter(image!, imgfile!);
+                var img = await ApplyOpenCv2DFilter(imgfile!);
                 setState(() {
                   image = img;
                 });
@@ -88,7 +91,7 @@ class _HomeState extends State<Home> {
                       child: Text('Median blur',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyMedianBlur(image!, imgfile!);
+                var img = await ApplyMedianBlur(imgfile!);
                 setState(() {
                   image = img;
                 });
@@ -103,7 +106,7 @@ class _HomeState extends State<Home> {
                       child: Text('Gaussian blur',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyGaussianBlur(image!, imgfile!);
+                var img = await ApplyGaussianBlur(imgfile!);
                 setState(() {
                   image = img;
                 });
@@ -118,7 +121,7 @@ class _HomeState extends State<Home> {
                       child: Text('Sobel',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplySobel(image!, imgfile!);
+                var img = await ApplySobel(imgfile!);
                 setState(() {
                   image = img;
                 });
@@ -133,7 +136,7 @@ class _HomeState extends State<Home> {
                       child: Text('Laplacian',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyLaplacian(image!, imgfile!);
+                var img = await ApplyLaplacian(imgfile!);
                 setState(() {
                   image = img;
                 });
@@ -148,7 +151,7 @@ class _HomeState extends State<Home> {
                       child: Text('Dilate',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyDilate(image!, imgfile!);
+                var img = await ApplyDilate(imgfile!);
                 setState(() {
                   image = img;
                 });
@@ -163,7 +166,7 @@ class _HomeState extends State<Home> {
                       child: Text('Erode',
                           style: TextStyle(color: Colors.white)))),
               onTap: () async {
-                var img = await ApplyErode(image!, imgfile!);
+                var img = await ApplyErode(imgfile!);
                 setState(() {
                   image = img;
                 });
@@ -195,7 +198,9 @@ class _HomeState extends State<Home> {
         ),
         const SizedBox(width: 5),
         ElevatedButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            cropSquareImage(imgfile!);
+          },
           icon: const Icon(Icons.cut),
           label: const Text('Crop'),
           style: ElevatedButton.styleFrom(primary: Colors.deepPurple),
@@ -204,11 +209,24 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Future<Null> cropSquareImage(File imagefile) async {
+    File? croppedFile = await cropper.cropImage(
+        sourcePath: imagefile.path,
+        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+        aspectRatioPresets: [CropAspectRatioPreset.square]);
+    if (croppedFile != null) {
+      setState(() {
+        imgfile = croppedFile;
+        image = Image.file(croppedFile);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: const Text('Photo editor'),
+            title: const Text('Photo editor', style: TextStyle(fontSize: 14)),
             backgroundColor: Colors.deepPurple,
             actions: [
               IconButton(
@@ -222,6 +240,13 @@ class _HomeState extends State<Home> {
               IconButton(
                   icon: const Icon(Icons.restore),
                   onPressed: restoreOriginalImage),
+              IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      swapwidget = buildOptions();
+                    });
+                  })
             ]),
         body: Column(
           children: [
