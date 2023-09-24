@@ -1,16 +1,53 @@
-# photoeditoropencv
 
-A new Flutter project.
+# Photo Editor com OpenCV (Editor de fotos com OpenCV)
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## 📖 Descrição
 
-A few resources to get you started if this is your first Flutter project:
+![gif](gif/photoeditor3.gif)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Esse projeto se refere a um editor de fotos que utiliza filtros de visão computacional. A visão computacional é uma área da inteligência artificial que permite aos computadores “verem” e interpretarem imagens digitais de maneira semelhante à visão humana. 
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
+## 🛠️ Funcionalidades
+
+- Aplicar filtros de visão computacional (Blur, 2DFilter, MedianBlur, GaussianBlur, Sobel, Laplacian, Dilate, Erode) em imagens;
+- Cortar imagens;
+- Rotacionar imagens;
+- Salvar a imagem editada.
+
+
+## 📡 Tecnologias utilizadas
+
+<div align="center"> 
+<img align="left" alt="NodeJs" height="30" width="30" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/flutter/flutter-original.svg">
+  
+</div>
+<br/><br/>
+
+## ⏳ Inicialização
+
+Esse projeto foi desenvolvido usando o framework de desenvolvimento mobile [Flutter](https://flutter.dev/). Para uso de filtros de visão computacional com OpenCv foi utilizada uma biblioteca externa que está disponível no [link](https://pub.dev/packages/opencv).
+
+
+
+## 🤵🤵‍♀️ Colaboradores
+
+O único colaborador desse projeto fui eu (Eduardo Vítor).
+
+<br/>
+
+## 🔎 Status do Projeto
+
+![Badge em Desenvolvimento](https://img.shields.io/badge/Status-Finalizado-blue)
+
+<br/>
+
+## 📑 Referências
+
+[Flutter](https://flutter.dev/)
+
+[Lib OpenCV](https://pub.dev/packages/opencv)
+
+
